@@ -1,0 +1,46 @@
+version: "3.5"
+services:
+    db:
+      image: mariadb:5.5.63
+      restart: always
+      volumes:
+        # - ./data/mariadb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+        # - ./data/mariadb/conf:/etc/mysql/conf.d
+        - ./data/mariadb/db:/var/lib/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: "root"
+        MYSQL_DATABASE: "sams2db"
+        MYSQL_USER: "sams2user"
+        MYSQL_PASSWORD: "sams2password"
+
+    # adminer:
+    #   image: adminer
+    #   restart: always
+    #   ports:
+    #     - 8080:8080
+
+    sams2:
+      build:
+        context: ./
+      container_name: sams2
+      environment:
+        # Connect to database
+        DB_SERVER: "db"
+        DB_NAME: "sams2db"
+        DB_USER: "sams2user"
+        DB_PASSWORD: "sams2password"
+        # Squid certificate
+        CN: "squid-proxy"   # Common name of the certificate
+        O: "UBS"            # Organization of the certificate ownerOrganization of the certificate owner
+        OU: "IT"            # Organization unit of the certificate ownerOrganization unit of the certificate owner
+        C: "RU"             # Two letter code of the country
+      ports:
+        - "43128:3128"      # HTTP proxy port for Squid
+        - "43129:4128"      # HTTPS proxy port for Squid
+        - "8081:80"         # HTTP port for SAMS2
+      volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        - ./data/sams2/squid.log.d:/var/log/squid
+        - ./data/sams2/squid.conf:/etc/squid/squid.conf:rw
+      restart: always
