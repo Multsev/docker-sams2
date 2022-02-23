@@ -42,5 +42,5 @@ services:
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
         - ./data/sams2/squid.log.d:/var/log/squid
-        - ./data/sams2/squid.conf:/etc/squid/squid.conf:rw
+        # - ./data/sams2/squid.conf:/etc/squid/squid.conf:rw
       restart: always
